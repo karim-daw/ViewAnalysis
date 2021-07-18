@@ -3,110 +3,102 @@ using Grasshopper.Kernel;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
+using Rhino.Geometry.Collections;
 
 namespace ViewAnalysis
 {
-    public class ViewAnalysisComponent : GH_Component
+    public class GhcMakeViewCones : GH_Component
     {
-
-        public ViewAnalysisComponent()
+        public GhcMakeViewCones()
           : base("GenerateViewCones", "VA-GVC",
             "Generate view cones for selected view points with a pre-determined resolution",
             "ViewAnalysis", "0_Preperation")
         {
         }
-
         /// <summary>
         /// Registers all the input parameters for this component.
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddMeshParameter("AnalysisMesh", "Mesh", "Mesh representing object you want to perform view analysis on for each mesh face {item:mesh}", GH_ParamAccess.item);
-            pManager.AddNumberParameter("ViewAngle", "Angle", "Angle range. If None, 120 degrees is used {item,float,optional}", GH_ParamAccess.item, 120);
-            pManager.AddBrepParameter("ObstacleGeometry", "Obstacle", "Breps or Meshes to be used as viewing Obstacles, be sure to include the objects" +
-                " from which you are testing the views from {List,Mesh/Brep}", GH_ParamAccess.list);
+            pManager.AddNumberParameter("ViewAngle", "Angle", "Angle range. If None, 120 degrees is used {item:float}", GH_ParamAccess.item, 120);
+            pManager.AddNumberParameter("AngleIntervalResolution", "Interval", "Angle interval that will determine the resolution of the generated view cone {item:int}", GH_ParamAccess.item, 20);
+            pManager.AddBooleanParameter("RunViewAnalysis", "Run", "Run the view analysis with the given input parameters {item:bool}", GH_ParamAccess.item, false);
         }
-
         /// <summary>
         /// Registers all the output parameters for this component.
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-
             pManager.AddGenericParameter("ViewRays", "Rays", "A nested list containing a list or ray3ds for each analysis point {list[list],ray3d}", GH_ParamAccess.list);
             pManager.AddNumberParameter("RayCountPerPoint", "RayCount", "A list of numbers referring to amount of hits each ray of each analysis point receives of the target mesh {list,int}", GH_ParamAccess.list);
-
         }
-
         /// <summary>
         /// This is the method that actually does the work.
         /// </summary>
- 
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             // First, we need to retrieve all data from the input parameters.
             // We'll start by declaring variables and assigning them starting values.
-            Plane plane = Plane.WorldXY;
-            double radius0 = 0.0;
-            double radius1 = 0.0;
-            int turns = 0;
+            Mesh mesh = new Rhino.Geometry.Mesh();
+            double angle = 0.0;
+            int interval = 0;
+            Boolean run = false;
 
             // Then we need to access the input parameters individually. 
             // When data cannot be extracted from a parameter, we should abort this method.
-            if (!DA.GetData(0, ref plane)) return;
-            if (!DA.GetData(1, ref radius0)) return;
-            if (!DA.GetData(2, ref radius1)) return;
-            if (!DA.GetData(3, ref turns)) return;
+            if (!DA.GetData(0, ref mesh))
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "No mesh provided");
+                return;
+            }
+            if (!DA.GetData(1, ref angle)) return;
+            if (!DA.GetData(2, ref interval)) return;
+            if (!DA.GetData(3, ref run)) return;
 
             // We should now validate the data and warn the user if invalid data is supplied.
-            if (radius0 < 0.0)
+            if (!mesh.IsValid)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Inner radius must be bigger than or equal to zero");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "This Input is not valid, check if input is a mesh");
                 return;
             }
-            if (radius1 <= radius0)
+            if (interval >= angle)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Outer radius must be bigger than the inner radius");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Interval input needs to be smaller than the Angle input");
                 return;
             }
-            if (turns <= 0)
+            if (interval < 5)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Spiral turn count must be bigger than or equal to one");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "An interval smaller than 5 would cause a long and probably not diminishing return calculation ");
                 return;
             }
 
-            // We're set to create the spiral now. To keep the size of the SolveInstance() method small, 
-            // The actual functionality will be in a different method:
-            Curve spiral = CreateSpiral(plane, radius0, radius1, turns);
 
+            // Main
+            // 1. Get Analysis Points and Vectors
+            Utilities utilities = new Utilities();
+            Tuple<List<Point3d>, MeshFaceNormalList> tuple = utilities.getAnalysisLocations(mesh);
+
+            // 2. Unpack Data and create cones
+            List<Point3d> point3Ds = tuple.Item1;
+            MeshFaceNormalList vector3Ds = tuple.Item2;
+
+            // 3. For each point, compute view cone
+            ViewCone viewCone = new ViewCone();
+            List<List<Ray3d>> viewRays = new List<List<Ray3d>>();
+            for (int i = 0; i < point3Ds.Count; i++)
+            {
+                Point3d pnt = point3Ds[i];
+                Vector3d vec = vector3Ds[i];
+                List<Ray3d> rays = viewCone.computeViewCone(pnt, vec, angle, interval);
+                viewRays.Add(rays);
+            }
+
+            DA.SetData(0, viewRays);
             // Finally assign the spiral to the output parameter.
-            DA.SetData(0, spiral);
+            
         }
 
-        Curve CreateSpiral(Plane plane, double r0, double r1, Int32 turns)
-        {
-            Line l0 = new Line(plane.Origin + r0 * plane.XAxis, plane.Origin + r1 * plane.XAxis);
-            Line l1 = new Line(plane.Origin - r0 * plane.XAxis, plane.Origin - r1 * plane.XAxis);
-
-            Point3d[] p0;
-            Point3d[] p1;
-
-            l0.ToNurbsCurve().DivideByCount(turns, true, out p0);
-            l1.ToNurbsCurve().DivideByCount(turns, true, out p1);
-
-            PolyCurve spiral = new PolyCurve();
-
-            for (int i = 0; i < p0.Length - 1; i++)
-            {
-                Arc arc0 = new Arc(p0[i], plane.YAxis, p1[i + 1]);
-                Arc arc1 = new Arc(p1[i + 1], -plane.YAxis, p0[i + 1]);
-
-                spiral.Append(arc0);
-                spiral.Append(arc1);
-            }
-
-            return spiral;
-        }
 
         /// <summary>
         /// The Exposure property controls where in the panel a component icon 
