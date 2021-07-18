@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "JT9UBq7RwYyc5GQZgpQ6yLcTpoG/1htdJO3iVUGtFAXGgbCdxdP9rUUjDTZinqAyvHkoDK7xKNY1QGQL71QzOw==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\karimd\\source\\repos\\ViewAnalysis\\ViewAnalysis\\ViewAnalysis.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\karimd\\.nuget\\packages\\grasshopper\\7.4.21078.1001\\grasshopper.7.4.21078.1001.nupkg.sha512",
+    "C:\\Users\\karimd\\.nuget\\packages\\rhinocommon\\7.4.21078.1001\\rhinocommon.7.4.21078.1001.nupkg.sha512"
+  ],
+  "logs": []
+}
