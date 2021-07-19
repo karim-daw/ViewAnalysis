@@ -11,10 +11,13 @@ namespace ViewAnalysis
     class ViewCone
     {
         public int RayCount = 0;
+
         public Point3d Point = new Point3d(0.0, 0.0, 0.0);
         public Vector3d Vector = new Vector3d(0.0, 1.0, 0.0);
         public double Angle = 120.0;
         public int AngleStep = 20;
+
+        private List<Ray3d> Rays = new List<Ray3d>();
 
         public ViewCone(Point3d point, Vector3d vector, double angle, int angleStep)
         {
@@ -74,13 +77,27 @@ namespace ViewAnalysis
                     counter++;
                 }
             }
+
+            // Save to member fields
             RayCount = counter;
+            Rays = rays;
 
             return rays;
 
 
         }
 
+
+        public void VisualiseViewCone()
+        {
+            for(int i = 0; i < Rays.Count; i++)
+            {
+                Ray3d ray = Rays[i];
+                Point3d pnt = ray.Position;
+
+            }
+
+        }
 
     }
 }
