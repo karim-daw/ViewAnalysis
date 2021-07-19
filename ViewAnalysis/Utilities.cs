@@ -29,6 +29,8 @@ namespace ViewAnalysis
             MeshFaceNormalList normals = mesh.FaceNormals;
             List<Point3d> centers = new List<Point3d>();
 
+            int fCount = faces.Count;
+
             for(int i = 0; i < faces.Count; i++)
             {
                 Point3d cPnt = faces.GetFaceCenter(i);
@@ -39,6 +41,8 @@ namespace ViewAnalysis
             return Tuple.Create(centers, normals);
 
         }
+
+        
  
 
     }

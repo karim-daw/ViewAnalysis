@@ -21,8 +21,8 @@ namespace ViewAnalysis
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddMeshParameter("AnalysisMesh", "Mesh", "Mesh representing object you want to perform view analysis on for each mesh face {item:mesh}", GH_ParamAccess.item);
-            pManager.AddNumberParameter("ViewAngle", "Angle", "Angle range. If None, 120 degrees is used {item:float}", GH_ParamAccess.item, 120);
-            pManager.AddNumberParameter("AngleIntervalResolution", "Interval", "Angle interval that will determine the resolution of the generated view cone {item:int}", GH_ParamAccess.item, 20);
+            pManager.AddNumberParameter("ViewAngle", "Angle", "Angle range. If None, 120 degrees is used {item:float}", GH_ParamAccess.item, 120.0);
+            pManager.AddIntegerParameter("AngleIntervalResolution", "Interval", "Angle interval that will determine the resolution of the generated view cone {item:int}", GH_ParamAccess.item, 20);
             pManager.AddBooleanParameter("RunViewAnalysis", "Run", "Run the view analysis with the given input parameters {item:bool}", GH_ParamAccess.item, false);
         }
         /// <summary>
@@ -40,34 +40,34 @@ namespace ViewAnalysis
         {
             // First, we need to retrieve all data from the input parameters.
             // We'll start by declaring variables and assigning them starting values.
-            Mesh mesh = new Rhino.Geometry.Mesh();
-            double angle = 0.0;
-            int interval = 0;
-            Boolean run = false;
+            Mesh myMesh = new Rhino.Geometry.Mesh();
+            double myAngle = 0.0;
+            int myAngleStep = 0;
+            Boolean myRun = false;
 
             // Then we need to access the input parameters individually. 
             // When data cannot be extracted from a parameter, we should abort this method.
-            if (!DA.GetData(0, ref mesh))
+            if (!DA.GetData(0, ref myMesh))
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "No mesh provided");
                 return;
             }
-            if (!DA.GetData(1, ref angle)) return;
-            if (!DA.GetData(2, ref interval)) return;
-            if (!DA.GetData(3, ref run)) return;
+            if (!DA.GetData(1, ref myAngle)) return;
+            if (!DA.GetData(2, ref myAngleStep)) return;
+            if (!DA.GetData(3, ref myRun)) return;
 
             // We should now validate the data and warn the user if invalid data is supplied.
-            if (!mesh.IsValid)
+            if (!myMesh.IsValid)
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "This Input is not valid, check if input is a mesh");
                 return;
             }
-            if (interval >= angle)
+            if (myAngleStep >= myAngle)
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Interval input needs to be smaller than the Angle input");
                 return;
             }
-            if (interval < 5)
+            if (myAngleStep < 5)
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "An interval smaller than 5 would cause a long and probably not diminishing return calculation ");
                 return;
@@ -77,24 +77,32 @@ namespace ViewAnalysis
             // Main
             // 1. Get Analysis Points and Vectors
             Utilities utilities = new Utilities();
-            Tuple<List<Point3d>, MeshFaceNormalList> tuple = utilities.getAnalysisLocations(mesh);
+            Tuple<List<Point3d>, MeshFaceNormalList> tuple = utilities.getAnalysisLocations(myMesh);
 
             // 2. Unpack Data and create cones
             List<Point3d> point3Ds = tuple.Item1;
             MeshFaceNormalList vector3Ds = tuple.Item2;
 
-            // 3. For each point, compute view cone
+            // 3. Init ViewCone
             ViewCone viewCone = new ViewCone();
-            List<List<Ray3d>> viewRays = new List<List<Ray3d>>();
+
+            // 4. Calculate only first cone to get Ray count
+            viewCone.computeViewCone(point3Ds[0], vector3Ds[0], myAngle, myAngleStep);
+            int out_RayCount = viewCone.RayCount;
+
+            // 5. For each point, compute view cone
+            List<List<Ray3d>> out_ViewRays = new List<List<Ray3d>>();
             for (int i = 0; i < point3Ds.Count; i++)
             {
                 Point3d pnt = point3Ds[i];
                 Vector3d vec = vector3Ds[i];
-                List<Ray3d> rays = viewCone.computeViewCone(pnt, vec, angle, interval);
-                viewRays.Add(rays);
+
+                List<Ray3d> rays = viewCone.computeViewCone(pnt, vec, myAngle, myAngleStep);
+                out_ViewRays.Add(rays);
             }
 
-            DA.SetData(0, viewRays);
+            DA.SetData(0, out_ViewRays);
+            DA.SetData(1, out_RayCount);
             // Finally assign the spiral to the output parameter.
             
         }

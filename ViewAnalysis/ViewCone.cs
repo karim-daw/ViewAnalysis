@@ -10,6 +10,8 @@ namespace ViewAnalysis
 {
     class ViewCone
     {
+        public int RayCount = 0;
+
         public List<Ray3d> computeViewCone(Point3d point, Vector3d vector, double angle, int angleStep)
         {
             // Create number range for cone
@@ -21,6 +23,9 @@ namespace ViewAnalysis
 
             // init list for rays
             List<Ray3d> rays = new List<Ray3d>();
+
+            // make counter
+            int counter = 0;
 
             // rotate vector around z vector
             for(int i = min; i < max; i += angleStep)
@@ -54,9 +59,13 @@ namespace ViewAnalysis
                     // create ray and append to list
                     Ray3d ray = new Rhino.Geometry.Ray3d(point, rotVector2);
                     rays.Add(ray);
+                    counter++;
                 }
             }
+            RayCount = counter;
+
             return rays;
+
 
         }
     }
