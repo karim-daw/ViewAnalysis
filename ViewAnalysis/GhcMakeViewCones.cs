@@ -40,34 +40,34 @@ namespace ViewAnalysis
         {
             // First, we need to retrieve all data from the input parameters.
             // We'll start by declaring variables and assigning them starting values.
-            Mesh myMesh = new Rhino.Geometry.Mesh();
-            double myAngle = 0.0;
-            int myAngleStep = 0;
-            Boolean myRun = false;
+            Mesh in_Mesh = new Rhino.Geometry.Mesh();
+            double in_Angle = 0.0;
+            int in_AngleStep = 0;
+            Boolean in_Run = false;
 
             // Then we need to access the input parameters individually. 
             // When data cannot be extracted from a parameter, we should abort this method.
-            if (!DA.GetData(0, ref myMesh))
+            if (!DA.GetData(0, ref in_Mesh))
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "No mesh provided");
                 return;
             }
-            if (!DA.GetData(1, ref myAngle)) return;
-            if (!DA.GetData(2, ref myAngleStep)) return;
-            if (!DA.GetData(3, ref myRun)) return;
+            if (!DA.GetData(1, ref in_Angle)) return;
+            if (!DA.GetData(2, ref in_AngleStep)) return;
+            if (!DA.GetData(3, ref in_Run)) return;
 
             // We should now validate the data and warn the user if invalid data is supplied.
-            if (!myMesh.IsValid)
+            if (!in_Mesh.IsValid)
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "This Input is not valid, check if input is a mesh");
                 return;
             }
-            if (myAngleStep >= myAngle)
+            if (in_AngleStep >= in_Angle)
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Interval input needs to be smaller than the Angle input");
                 return;
             }
-            if (myAngleStep < 5)
+            if (in_AngleStep < 5)
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "An interval smaller than 5 would cause a long and probably not diminishing return calculation ");
                 return;
@@ -77,33 +77,32 @@ namespace ViewAnalysis
             // Main
             // 1. Get Analysis Points and Vectors
             Utilities utilities = new Utilities();
-            Tuple<List<Point3d>, MeshFaceNormalList> tuple = utilities.getAnalysisLocations(myMesh);
+            Tuple<List<Point3d>, MeshFaceNormalList> tuple = utilities.getAnalysisLocations(in_Mesh);
 
             // 2. Unpack Data and create cones
             List<Point3d> point3Ds = tuple.Item1;
             MeshFaceNormalList vector3Ds = tuple.Item2;
 
             // 3. Init ViewCone
-            ViewCone viewCone = new ViewCone();
+            ViewCone firstViewCone = new ViewCone(point3Ds[0], vector3Ds[0], in_Angle, in_AngleStep);
 
             // 4. Calculate only first cone to get Ray count
-            viewCone.computeViewCone(point3Ds[0], vector3Ds[0], myAngle, myAngleStep);
-            int out_RayCount = viewCone.RayCount;
+            firstViewCone.ComputeViewCone();
+            int out_RayCount = firstViewCone.RayCount;
 
             // 5. For each point, compute view cone
             List<List<Ray3d>> out_ViewRays = new List<List<Ray3d>>();
             for (int i = 0; i < point3Ds.Count; i++)
             {
-                Point3d pnt = point3Ds[i];
-                Vector3d vec = vector3Ds[i];
-
-                List<Ray3d> rays = viewCone.computeViewCone(pnt, vec, myAngle, myAngleStep);
+                ViewCone viewCone = new ViewCone(point3Ds[i], vector3Ds[i], in_Angle, in_AngleStep);
+                List<Ray3d> rays = viewCone.ComputeViewCone();
                 out_ViewRays.Add(rays);
             }
 
+            // 6. Finally assign the spiral to the output parameter
             DA.SetData(0, out_ViewRays);
             DA.SetData(1, out_RayCount);
-            // Finally assign the spiral to the output parameter.
+            
             
         }
 
