@@ -88,14 +88,34 @@ namespace ViewAnalysis
         }
 
 
-        public void VisualiseViewCone()
+        public List<Line> VisualiseViewCone(double amplitude)
         {
+
+            // init list of extracted directions from rays
+
+            List<Line> lines = new List<Line>();
+
             for(int i = 0; i < Rays.Count; i++)
             {
                 Ray3d ray = Rays[i];
-                Point3d pnt = ray.Position;
 
+                // Get Ray Position
+                Point3d pos = ray.Position;
+
+                // Get Ray Vector and add to list
+                Vector3d dir = ray.Direction;
+
+                // Move pos by vector by amplitude provided
+                Point3d mPos = pos + (dir * amplitude);
+
+                // Create Line
+                Line line = new Line(pos, mPos);
+
+                // output vectors as lines
+                lines.Add(line);
             }
+
+            return lines;
 
         }
 
