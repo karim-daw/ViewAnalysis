@@ -10,29 +10,26 @@ namespace ViewAnalysis
     public class GhcMakeViewCones : GH_Component
     {
         public GhcMakeViewCones()
-          : base("GenerateViewCones", "VA-GVC",
-            "Generate view cones for selected view points with a pre-determined resolution",
+          : base("MakeViewCones", "VA-MVC",
+            "Make view cones for selected view points with a pre-determined resolution",
             "ViewAnalysis", "0_Preperation")
         {
         }
-        /// <summary>
-        /// Registers all the input parameters for this component.
-        /// </summary>
+
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddMeshParameter("AnalysisMesh", "Mesh", "Mesh representing object you want to perform view analysis on for each mesh face {item:mesh}", GH_ParamAccess.item);
+            pManager.AddMeshParameter("AnalysisMesh", "Mesh", "Mesh representing object you want to perform view analysis on for each mesh face {item:Mesh}", GH_ParamAccess.item);
             pManager.AddNumberParameter("ViewAngle", "Angle", "Angle range. If None, 120 degrees is used {item:float}", GH_ParamAccess.item, 120.0);
             pManager.AddIntegerParameter("AngleIntervalResolution", "Interval", "Angle interval that will determine the resolution of the generated view cone {item:int}", GH_ParamAccess.item, 20);
             pManager.AddBooleanParameter("RunViewAnalysis", "Run", "Run the view analysis with the given input parameters {item:bool}", GH_ParamAccess.item, false);
         }
-        /// <summary>
-        /// Registers all the output parameters for this component.
-        /// </summary>
+
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter("ViewRays", "Rays", "A nested list containing a list or ray3ds for each analysis point {list[list],ray3d}", GH_ParamAccess.list);
+            pManager.AddGenericParameter("ViewRays", "Rays", "A nested list containing a list or ray3ds for each analysis point {list[list],Ray3d}", GH_ParamAccess.list);
             pManager.AddNumberParameter("RayCountPerPoint", "RayCount", "A list of numbers referring to amount of hits each ray of each analysis point receives of the target mesh {list,int}", GH_ParamAccess.list);
         }
+
         /// <summary>
         /// This is the method that actually does the work.
         /// </summary>
@@ -74,10 +71,11 @@ namespace ViewAnalysis
             }
 
 
-            // Main
+            /////////// Main ///////////
+
             // 1. Get Analysis Points and Vectors
             Utilities utilities = new Utilities();
-            Tuple<List<Point3d>, MeshFaceNormalList> tuple = utilities.getAnalysisLocations(in_Mesh);
+            Tuple<List<Point3d>, MeshFaceNormalList> tuple = utilities.GetAnalysisLocations(in_Mesh);
 
             // 2. Unpack Data and create cones
             List<Point3d> point3Ds = tuple.Item1;
@@ -99,7 +97,7 @@ namespace ViewAnalysis
                 out_ViewRays.Add(rays);
             }
 
-            // 6. Finally assign the spiral to the output parameter
+            // 6. Finally assign the output parameters
             DA.SetData(0, out_ViewRays);
             DA.SetData(1, out_RayCount);
             

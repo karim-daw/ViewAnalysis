@@ -17,7 +17,11 @@ namespace ViewAnalysis
         public double Angle = 120.0;
         public int AngleStep = 20;
 
-        private List<Ray3d> Rays = new List<Ray3d>();
+
+        public ViewCone()
+        {
+        }
+
 
         public ViewCone(Point3d point, Vector3d vector, double angle, int angleStep)
         {
@@ -80,24 +84,22 @@ namespace ViewAnalysis
 
             // Save to member fields
             RayCount = counter;
-            Rays = rays;
 
             return rays;
-
 
         }
 
 
-        public List<Line> VisualiseViewCone(double amplitude)
+        public List<Line> VisualiseViewCone(double amplitude, List<Ray3d> rays)
         {
 
             // init list of extracted directions from rays
 
             List<Line> lines = new List<Line>();
 
-            for(int i = 0; i < Rays.Count; i++)
+            for(int i = 0; i < rays.Count; i++)
             {
-                Ray3d ray = Rays[i];
+                Ray3d ray = rays[i];
 
                 // Get Ray Position
                 Point3d pos = ray.Position;
