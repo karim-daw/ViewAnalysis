@@ -98,7 +98,7 @@ namespace ViewAnalysis
             }
 
             // 6. Finally assign the output parameters
-            DA.SetData(0, out_ViewRays);
+            DA.SetDataList(0, out_ViewRays);
             DA.SetData(1, out_RayCount);
             
             

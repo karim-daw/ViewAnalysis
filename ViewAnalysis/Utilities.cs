@@ -47,14 +47,14 @@ namespace ViewAnalysis
         public List<int> MakeRandomIntegers(int min, int max, int count)
         {
             // Init random
-            var rand = new Random();
+            var rand = new Random(3007);
 
             // Generate list of random integers of length "count" between "start" and "end
             List<int> randNums = new List<int>();
 
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i <= count; i++)
             {
-                int randNum = rand.Next(min, max);
+                int randNum = rand.Next(min, max + 1);
                 randNums.Add(randNum);
             }
             return randNums;

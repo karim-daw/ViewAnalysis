@@ -45,7 +45,8 @@ namespace ViewAnalysis
 
             // Then we need to access the input parameters individually. 
             // When data cannot be extracted from a parameter, we should abort this method.
-            if (!DA.GetData(0, ref in_Rays))
+            
+            if (!DA.GetDataList(0, in_Rays))
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "No rays provided");
                 return;
@@ -102,7 +103,7 @@ namespace ViewAnalysis
             DataTree<Line> out_DataTree = utilities.ListOfListsToTree(nlines);
 
             // 5. Finally assign the output parameters
-            DA.SetData(0, out_DataTree);
+            DA.SetDataTree(0, out_DataTree);
 
 
         }
