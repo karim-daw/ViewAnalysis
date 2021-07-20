@@ -56,7 +56,7 @@ namespace ViewAnalysis
             if (!DA.GetData(3, ref in_Run)) return;
 
             // We should now validate the data and warn the user if invalid data is supplied.
-            if (in_Amplitude <= 0)
+            if (in_Amplitude < 0)
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "The amplitude should not be 0 or a negative number");
                 return;
@@ -80,7 +80,7 @@ namespace ViewAnalysis
 
             // 2. Get list of random numbers
             Utilities utilities = new Utilities();
-            List<int> randInts = utilities.MakeRandomIntegers(0, raysCount, reducedRayCount);
+            List<int> randInts = utilities.MakeRandomIntegers(0, raysCount-1, reducedRayCount);
 
             // 3. Get nested List of Rays and loop through them with random indexes
 

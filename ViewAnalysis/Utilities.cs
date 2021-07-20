@@ -52,7 +52,7 @@ namespace ViewAnalysis
             // Generate list of random integers of length "count" between "start" and "end
             List<int> randNums = new List<int>();
 
-            for (int i = 0; i <= count; i++)
+            for (int i = 0; i <= count -1; i++)
             {
                 int randNum = rand.Next(min, max + 1);
                 randNums.Add(randNum);
