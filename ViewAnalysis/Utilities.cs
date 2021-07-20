@@ -41,37 +41,15 @@ namespace ViewAnalysis
 
         }
 
-        /*
         /// <summary>
         /// Generates a list of shuffled integers
         /// </summary>
         /// <param name="count">amount of random intergers</param>
-        /// <returns> a list of random numbers with a set min, max and count</returns>
+        /// <returns> returns a list of shuffled integers</returns>
         public List<int> MakeRandomIntegers(int count)
         {
             // Init random
-            var rand = new Random(3007);
-
-            // Generate list of random integers of length "count" between "start" and "end
-            List<int> randNums = new List<int>();
-
-            for (int i = 0; i <= count -1; i++)
-            {
-                int randNum = rand.Next(min, max + 1);
-                randNums.Add(randNum);
-            }
-            return randNums;
-        }
-        */
-
-        /// <summary>
-        /// Generates a list of shuffled integers
-        /// </summary>
-        /// <param name="count">samount of random intergers</param>
-        /// <returns> a list of random numbers with a set min, max and count</returns>
-        public List<int> MakeRandomIntegers(int count)
-        {
-            // Init random
+            // Happy Birthday mom
             var rand = new Random(3007);
 
             // Generate list of numbers
@@ -85,13 +63,8 @@ namespace ViewAnalysis
             {
                 shuffledList.Add(value);
             }
-
             return shuffledList;
         }
-
-
-
-
 
         // Thanks Andrew Heuman:)
         /// <summary>
