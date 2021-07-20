@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Grasshopper.Kernel;
 using Rhino.Geometry;
@@ -80,8 +81,8 @@ namespace ViewAnalysis
 
             // 2. Get list of random numbers
             Utilities utilities = new Utilities();
-            List<int> randInts = utilities.MakeRandomIntegers(0, raysCount-1, reducedRayCount);
-
+            List<int> randInts = utilities.MakeRandomIntegers(raysCount);
+            
             // 3. Get nested List of Rays and loop through them with random indexes
 
             // init nested list of lines

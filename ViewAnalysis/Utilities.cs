@@ -13,13 +13,10 @@ namespace ViewAnalysis
     class Utilities
     {
         /// <summary>
-        /// Visits all mesh faces and gets centers points and normals
-        /// <summary>
-        /// Input:
-        ///     Analysis mesh { Mesh: Item }
-        /// Output:
-        ///     Center points and normals {Point3d,MeshFaceNormalList : Tuple( list(Point3d) , MeshFaceNormalList ) }
-
+        /// Takes a mesh and returns the mesh face center points and their normals {item:Mesh}
+        /// </summary>
+        /// <param name="mesh">Input mesh to compute mesh face centers and normals from</param>
+        /// <returns>Tuple with the mesh face center points and the normals {tuple:(Point3d,Vector3d)</returns>
         public Tuple<List<Point3d>,MeshFaceNormalList> GetAnalysisLocations(Mesh mesh)
         {
             if (mesh.FaceNormals.Count == 0)
@@ -44,7 +41,13 @@ namespace ViewAnalysis
 
         }
 
-        public List<int> MakeRandomIntegers(int min, int max, int count)
+        /*
+        /// <summary>
+        /// Generates a list of shuffled integers
+        /// </summary>
+        /// <param name="count">amount of random intergers</param>
+        /// <returns> a list of random numbers with a set min, max and count</returns>
+        public List<int> MakeRandomIntegers(int count)
         {
             // Init random
             var rand = new Random(3007);
@@ -59,9 +62,44 @@ namespace ViewAnalysis
             }
             return randNums;
         }
+        */
+
+        /// <summary>
+        /// Generates a list of shuffled integers
+        /// </summary>
+        /// <param name="count">samount of random intergers</param>
+        /// <returns> a list of random numbers with a set min, max and count</returns>
+        public List<int> MakeRandomIntegers(int count)
+        {
+            // Init random
+            var rand = new Random(3007);
+
+            // Generate list of numbers
+            var list = Enumerable.Range(0, count).ToList();
+
+            // Shuffle list
+            var randomized = list.OrderBy(item => rand.Next());
+
+            List<int> shuffledList = new List<int>();
+            foreach (var value in randomized)
+            {
+                shuffledList.Add(value);
+            }
+
+            return shuffledList;
+        }
+
+
+
 
 
         // Thanks Andrew Heuman:)
+        /// <summary>
+        /// Converts a nested list into a data treee
+        /// </summary>
+        /// <typeparam name="T">Generic dataType</typeparam>
+        /// <param name="list">nested list to convert to data tree</param>
+        /// <returns>datatree equivalent of nested list</returns>
         public DataTree<T> ListOfListsToTree<T>(List<List<T>> list)
         {
             DataTree<T> tree = new DataTree<T>();
@@ -73,8 +111,5 @@ namespace ViewAnalysis
             }
             return tree;
         }
-
-
-
     }
 }
