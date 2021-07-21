@@ -96,7 +96,7 @@ namespace ViewAnalysis
                 List<Ray3d> rays = in_Rays[rI];
 
                 // Compute lines and append
-                List<Line> lines = new ViewCone().VisualiseViewCone(in_Amplitude, rays);
+                List<Line> lines = new Visualize().VisualiseViewCone(in_Amplitude, rays);
                 nlines.Add(lines);
             }
 
