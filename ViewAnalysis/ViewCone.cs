@@ -112,6 +112,26 @@ namespace ViewAnalysis
             return rays;
         }
 
+        public int ComputeHits(List<Ray3d> rays, Mesh targetMesh, Mesh obstaclesMesh)
+        {
+            int hit = 0;
+
+            for(int i = 0; i < rays.Count; i++)
+            {
+                Ray3d ray = rays[i];
+
+                double hitTarget = Rhino.Geometry.Intersect.Intersection.MeshRay(targetMesh, ray);
+                double hitObstacle = Rhino.Geometry.Intersect.Intersection.MeshRay(obstaclesMesh, ray);
+
+                if (hitTarget >= 0.0 && hitObstacle < 0.0) 
+                {
+                    hit++;
+                }
+            }
+            return hit;
+
+        }
+
 
 
     }
