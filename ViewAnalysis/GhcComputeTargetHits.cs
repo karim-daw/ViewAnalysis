@@ -41,7 +41,7 @@ namespace ViewAnalysis
         /// </summary>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-
+            List<List<Ray3d>> in_Rays = new List<List<Ray3d>>();
         }
 
         /// <summary>
