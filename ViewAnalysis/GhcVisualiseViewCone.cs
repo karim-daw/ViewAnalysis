@@ -19,6 +19,7 @@ namespace ViewAnalysis
         {
         }
 
+
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("RaysToVisualize", "Rays", "A list of nested lists of rays to visualize with lines {List[List]:Ray3d}", GH_ParamAccess.list);

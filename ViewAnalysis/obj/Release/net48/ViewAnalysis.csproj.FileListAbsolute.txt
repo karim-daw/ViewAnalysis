@@ -1,0 +1,7 @@
+C:\Users\karimd\source\repos\ViewAnalysis\ViewAnalysis\bin\Release\net48\ViewAnalysis.gha
+C:\Users\karimd\source\repos\ViewAnalysis\ViewAnalysis\bin\Release\net48\ViewAnalysis.pdb
+C:\Users\karimd\source\repos\ViewAnalysis\ViewAnalysis\obj\Release\net48\ViewAnalysis.AssemblyInfoInputs.cache
+C:\Users\karimd\source\repos\ViewAnalysis\ViewAnalysis\obj\Release\net48\ViewAnalysis.AssemblyInfo.cs
+C:\Users\karimd\source\repos\ViewAnalysis\ViewAnalysis\obj\Release\net48\ViewAnalysis.csproj.CoreCompileInputs.cache
+C:\Users\karimd\source\repos\ViewAnalysis\ViewAnalysis\obj\Release\net48\ViewAnalysis.gha
+C:\Users\karimd\source\repos\ViewAnalysis\ViewAnalysis\obj\Release\net48\ViewAnalysis.pdb
