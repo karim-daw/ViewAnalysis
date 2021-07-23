@@ -8,9 +8,6 @@ namespace ViewAnalysis
 {
     public class GhcComputeTargetHits : GH_Component
     {
-        /// <summary>
-        /// Initializes a new instance of the MyComponent1 class.
-        /// </summary>
         public GhcComputeTargetHits()
           : base("ComputeTargetHits", "VA-CTH",
               "Computes the amount of rays that hit the target mesh from every view point",
@@ -23,7 +20,7 @@ namespace ViewAnalysis
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("RaysToCompute", "Rays", "A list of nested lists of rays to compute hit occurances of target mesh {List[List]:Ray3d}", GH_ParamAccess.list); pManager.AddNumberParameter("ViewAngle", "Angle", "Angle range. If None, 120 degrees is used {item:float}", GH_ParamAccess.item, 120.0);
+            pManager.AddGenericParameter("RaysToCompute", "Rays", "A list of nested lists of rays to compute hit occurances of target mesh {List[List]:Ray3d}", GH_ParamAccess.list);
             pManager.AddMeshParameter("TargetMesh", "Target", "Mesh to be used as a target for View Ray calculation { item: mesh}", GH_ParamAccess.item);
             pManager.AddMeshParameter("ObstaclesMesh", "Obstacles", "Mesh to be used as Obstacles occluding the view of the target(dont forget self occluding objects) { item: mesh}", GH_ParamAccess.item);
             pManager.AddBooleanParameter("RunComputeTargetHits", "Run", "Run the view analysis and compute how many rays hit the target mesh {item:bool}", GH_ParamAccess.item, false);
