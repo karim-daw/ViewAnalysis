@@ -24,7 +24,7 @@ namespace ViewAnalysis
             pManager.AddMeshParameter("TargetMesh", "Target", "Mesh to be used as a target for View Ray calculation { item: mesh}", GH_ParamAccess.item);
             pManager.AddMeshParameter("ObstaclesMesh", "Obstacles", "Mesh to be used as Obstacles occluding the view of the target(dont forget self occluding objects) { item: mesh}", GH_ParamAccess.item);
             pManager[2].Optional = true;
-            pManager.AddBooleanParameter("RunComputeTargetHits", "Run", "Run the view analysis and compute how many rays hit the target mesh {item:bool}", GH_ParamAccess.item, false);
+            pManager.AddBooleanParameter("RunComputeTargetHits", "Run", "Run the view analysis and compute how many rays hit the target mesh {item:bool}", GH_ParamAccess.item,false);
         }
 
         /// <summary>
@@ -60,10 +60,9 @@ namespace ViewAnalysis
                 return;
             }
 
-
-            if (DA.GetData(3, ref in_Run) == false)
+            if (!DA.GetData(3, ref in_Run))
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Set 'Run' to true in order to compute rays");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "No boolean toggle provided");
                 return;
             }
 
@@ -73,8 +72,13 @@ namespace ViewAnalysis
             List<int> out_viewHits = new List<int>();
 
             // 2. check if run is on, if not, return
-            if (in_Run == true)
+            if (in_Run == false)
             {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Set 'Run' to true in order to compute rays");
+                return;
+            }
+            else 
+            { 
                 // 3. loop through nested list of rays
                 for (int i = 0; i < in_Rays.Count; i++)
                 {
@@ -104,7 +108,6 @@ namespace ViewAnalysis
 
             // 6. Finally assign the output parameters
             DA.SetDataList(0, out_viewHits);
-
         }
 
         /// <summary>
