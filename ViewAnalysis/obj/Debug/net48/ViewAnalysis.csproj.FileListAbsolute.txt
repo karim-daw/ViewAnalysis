@@ -5,4 +5,4 @@ C:\Users\karimd\source\repos\ViewAnalysis\ViewAnalysis\obj\Debug\net48\ViewAnaly
 C:\Users\karimd\source\repos\ViewAnalysis\ViewAnalysis\obj\Debug\net48\ViewAnalysis.csproj.CoreCompileInputs.cache
 C:\Users\karimd\source\repos\ViewAnalysis\ViewAnalysis\obj\Debug\net48\ViewAnalysis.gha
 C:\Users\karimd\source\repos\ViewAnalysis\ViewAnalysis\obj\Debug\net48\ViewAnalysis.pdb
-C:\Users\karimd\source\repos\ViewAnalysis\ViewAnalysis\obj\Debug\net48\ViewAnalysis.csprojAssemblyReference.cache
+C:\Users\karimd\source\repos\ViewAnalysis\ViewAnalysis\obj\Debug\net48\ViewAnalysis.csproj.AssemblyReference.cache

@@ -21,7 +21,6 @@ namespace ViewAnalysis
             pManager.AddMeshParameter("AnalysisMesh", "Mesh", "Mesh representing object you want to perform view analysis on for each mesh face {item:Mesh}", GH_ParamAccess.item);
             pManager.AddNumberParameter("ViewAngle", "Angle", "Angle range. If None, 120 degrees is used {item:float}", GH_ParamAccess.item, 120.0);
             pManager.AddIntegerParameter("AngleIntervalResolution", "Interval", "Angle interval that will determine the resolution of the generated view cone {item:int}", GH_ParamAccess.item, 20);
-            pManager.AddBooleanParameter("RunViewAnalysis", "Run", "Run the view analysis with the given input parameters {item:bool}", GH_ParamAccess.item, false);
         }
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
@@ -40,7 +39,6 @@ namespace ViewAnalysis
             Mesh in_Mesh = new Rhino.Geometry.Mesh();
             double in_Angle = 0.0;
             int in_AngleStep = 0;
-            Boolean in_Run = false;
 
             // Then we need to access the input parameters individually. 
             // When data cannot be extracted from a parameter, we should abort this method.
@@ -51,7 +49,6 @@ namespace ViewAnalysis
             }
             if (!DA.GetData(1, ref in_Angle)) return;
             if (!DA.GetData(2, ref in_AngleStep)) return;
-            if (!DA.GetData(3, ref in_Run)) return;
 
             // We should now validate the data and warn the user if invalid data is supplied.
             if (!in_Mesh.IsValid)

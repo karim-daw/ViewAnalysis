@@ -23,6 +23,7 @@ namespace ViewAnalysis
             pManager.AddGenericParameter("RaysToCompute", "Rays", "A list of nested lists of rays to compute hit occurances of target mesh {List[List]:Ray3d}", GH_ParamAccess.list);
             pManager.AddMeshParameter("TargetMesh", "Target", "Mesh to be used as a target for View Ray calculation { item: mesh}", GH_ParamAccess.item);
             pManager.AddMeshParameter("ObstaclesMesh", "Obstacles", "Mesh to be used as Obstacles occluding the view of the target(dont forget self occluding objects) { item: mesh}", GH_ParamAccess.item);
+            pManager[2].Optional = true;
             pManager.AddBooleanParameter("RunComputeTargetHits", "Run", "Run the view analysis and compute how many rays hit the target mesh {item:bool}", GH_ParamAccess.item, false);
         }
 
@@ -59,11 +60,6 @@ namespace ViewAnalysis
                 return;
             }
 
-            if (!DA.GetData(2, ref in_ObsMesh))
-            {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "No obstacle mesh provided");
-                return;
-            }
 
             if (DA.GetData(3, ref in_Run) == false)
             {
@@ -87,8 +83,20 @@ namespace ViewAnalysis
 
                     // 4. init view cone to call ComputeRayHits method
                     ViewCone viewCone = new ViewCone();
-                    int hits = viewCone.ComputeRayHits(rays, in_TarMesh, in_ObsMesh);
 
+                    int hits = 0;
+
+                    if (!DA.GetData(2, ref in_ObsMesh))
+                    {
+                        AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "No obstacle mesh provided, calculation will be performed without obstacles");
+                        hits = viewCone.ComputeRayHits(rays, in_TarMesh);
+                    }
+                    else
+                    {
+                        AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Calculation will be performed with obstacles");
+                        hits = viewCone.ComputeRayHits(rays, in_TarMesh, in_ObsMesh);
+                    }
+                    
                     // 5. Add hits numbers to viewHits List
                     out_viewHits.Add(hits);
                 }

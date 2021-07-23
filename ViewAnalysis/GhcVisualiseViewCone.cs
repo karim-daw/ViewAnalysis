@@ -25,7 +25,6 @@ namespace ViewAnalysis
             pManager.AddGenericParameter("RaysToVisualize", "Rays", "A list of nested lists of rays to visualize with lines {List[List]:Ray3d}", GH_ParamAccess.list);
             pManager.AddNumberParameter("VectorAmplitude", "Amplitude", "Amplitude of vector this would be equivalent to the length of the lines representating the rays to visualize {item:float}", GH_ParamAccess.item, 10.0);
             pManager.AddNumberParameter("Percentage", "Percentage", "Percentage (number between 0 and 1) of view cones to visualize on the analysis mesh {item:float}", GH_ParamAccess.item, 0.1);
-            pManager.AddBooleanParameter("RunVisualizer", "Run", "Run the visualizer with the given input parameters {item:bool}", GH_ParamAccess.item, false);
         }
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
@@ -43,7 +42,6 @@ namespace ViewAnalysis
             List<List<Ray3d>> in_Rays = new List<List<Ray3d>>();
             double in_Amplitude = 0.0;
             double in_Percentage = 0.0;
-            Boolean in_Run = false;
 
             // Then we need to access the input parameters individually. 
             // When data cannot be extracted from a parameter, we should abort this method.
@@ -55,7 +53,6 @@ namespace ViewAnalysis
             }
             if (!DA.GetData(1, ref in_Amplitude)) return;
             if (!DA.GetData(2, ref in_Percentage)) return;
-            if (!DA.GetData(3, ref in_Run)) return;
 
             // We should now validate the data and warn the user if invalid data is supplied.
             if (in_Amplitude < 0)

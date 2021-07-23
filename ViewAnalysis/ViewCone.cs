@@ -113,7 +113,7 @@ namespace ViewAnalysis
         }
 
         /// <summary>
-        /// Computes whether a ray hits the a target mesh or not
+        /// Computes whether a ray hits the a target mesh with obstacles
         /// </summary>
         /// <param name="rays">rays to shoot {list:Ray3d}</param>
         /// <param name="targetMesh">mesh target to shoot rays at {item:Mesh}</param>
@@ -131,6 +131,32 @@ namespace ViewAnalysis
                 double hitObstacle = Rhino.Geometry.Intersect.Intersection.MeshRay(obstaclesMesh, ray);
 
                 if (hitTarget >= 0.0 && hitObstacle < 0.0) 
+                {
+                    hit++;
+                }
+            }
+            return hit;
+
+        }
+
+
+        /// <summary>
+        /// Computes whether a ray hits the a target mesh 
+        /// </summary>
+        /// <param name="rays">rays to shoot {list:Ray3d}</param>
+        /// <param name="targetMesh">mesh target to shoot rays at {item:Mesh}</param>
+        /// <returns>Number that is the sum of hits for all the input rays</returns>
+        public int ComputeRayHits(List<Ray3d> rays, Mesh targetMesh)
+        {
+            int hit = 0;
+
+            for (int i = 0; i < rays.Count; i++)
+            {
+                Ray3d ray = rays[i];
+
+                double hitTarget = Rhino.Geometry.Intersect.Intersection.MeshRay(targetMesh, ray);
+
+                if (hitTarget >= 0.0)
                 {
                     hit++;
                 }
