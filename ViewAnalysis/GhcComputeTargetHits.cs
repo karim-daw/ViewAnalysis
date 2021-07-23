@@ -26,6 +26,7 @@ namespace ViewAnalysis
             pManager.AddGenericParameter("RaysToCompute", "Rays", "A list of nested lists of rays to compute hit occurances of target mesh {List[List]:Ray3d}", GH_ParamAccess.list); pManager.AddNumberParameter("ViewAngle", "Angle", "Angle range. If None, 120 degrees is used {item:float}", GH_ParamAccess.item, 120.0);
             pManager.AddMeshParameter("TargetMesh", "Target", "Mesh to be used as a target for View Ray calculation { item: mesh}", GH_ParamAccess.item);
             pManager.AddMeshParameter("ObstaclesMesh", "Obstacles", "Mesh to be used as Obstacles occluding the view of the target(dont forget self occluding objects) { item: mesh}", GH_ParamAccess.item);
+            pManager.AddBooleanParameter("RunComputeTargetHits", "Run", "Run the view analysis and compute how many rays hit the target mesh {item:bool}", GH_ParamAccess.item, false);
         }
 
         /// <summary>
@@ -42,6 +43,63 @@ namespace ViewAnalysis
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             List<List<Ray3d>> in_Rays = new List<List<Ray3d>>();
+            Mesh in_TarMesh = new Mesh();
+            Mesh in_ObsMesh = new Mesh();
+            Boolean in_Run = false;
+
+            // Then we need to access the input parameters individually. 
+            // When data cannot be extracted from a parameter, we should abort this method.
+
+            if (!DA.GetDataList(0, in_Rays))
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "No rays provided");
+                return;
+            }
+
+            if (!DA.GetData(1, ref in_TarMesh))
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "No target mesh provided");
+                return;
+            }
+
+            if (!DA.GetData(2, ref in_ObsMesh))
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "No obstacle mesh provided");
+                return;
+            }
+
+            if (DA.GetData(3, ref in_Run) == false)
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Set 'Run' to true in order to compute rays");
+                return;
+            }
+
+            /////////// Main ///////////
+
+            // 1. start counter per view point
+            List<int> out_viewHits = new List<int>();
+
+            // 2. check if run is on, if not, return
+            if (in_Run == true)
+            {
+                // 3. loop through nested list of rays
+                for (int i = 0; i < in_Rays.Count; i++)
+                {
+                    // Access sub list of rays
+                    List<Ray3d> rays = in_Rays[i];
+
+                    // 4. init view cone to call ComputeRayHits method
+                    ViewCone viewCone = new ViewCone();
+                    int hits = viewCone.ComputeRayHits(rays, in_TarMesh, in_ObsMesh);
+
+                    // 5. Add hits numbers to viewHits List
+                    out_viewHits.Add(hits);
+                }
+            }
+
+            // 6. Finally assign the output parameters
+            DA.SetDataList(0, out_viewHits);
+
         }
 
         /// <summary>

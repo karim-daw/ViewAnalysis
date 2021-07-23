@@ -112,7 +112,14 @@ namespace ViewAnalysis
             return rays;
         }
 
-        public int ComputeHits(List<Ray3d> rays, Mesh targetMesh, Mesh obstaclesMesh)
+        /// <summary>
+        /// Computes whether a ray hits the a target mesh or not
+        /// </summary>
+        /// <param name="rays">rays to shoot {list:Ray3d}</param>
+        /// <param name="targetMesh">mesh target to shoot rays at {item:Mesh}</param>
+        /// <param name="obstaclesMesh">mesh obstacles that occlude target mesh {item:Mesh}</param>
+        /// <returns> Number that is the sum of hits for all the input rays</returns>
+        public int ComputeRayHits(List<Ray3d> rays, Mesh targetMesh, Mesh obstaclesMesh)
         {
             int hit = 0;
 
