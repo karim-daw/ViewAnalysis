@@ -21,6 +21,8 @@ namespace ViewAnalysis
             pManager.AddMeshParameter("AnalysisMesh", "Mesh", "Mesh representing object you want to perform view analysis on for each mesh face {item:Mesh}", GH_ParamAccess.item);
             pManager.AddNumberParameter("ViewAngle", "Angle", "Angle range. If None, 120 degrees is used {item:float}", GH_ParamAccess.item, 120.0);
             pManager.AddIntegerParameter("AngleIntervalResolution", "Interval", "Angle interval that will determine the resolution of the generated view cone {item:int}", GH_ParamAccess.item, 20);
+            pManager.AddVectorParameter("VectorOverride", "Vector", "Optional vector input if you want to override the view direction {item:Vector3d}", GH_ParamAccess.item);
+            pManager[3].Optional = true;
         }
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
@@ -39,6 +41,7 @@ namespace ViewAnalysis
             Mesh in_Mesh = new Rhino.Geometry.Mesh();
             double in_Angle = 0.0;
             int in_AngleStep = 0;
+            Vector3d in_Vector = new Vector3d();
 
             // Then we need to access the input parameters individually. 
             // When data cannot be extracted from a parameter, we should abort this method.
@@ -49,6 +52,7 @@ namespace ViewAnalysis
             }
             if (!DA.GetData(1, ref in_Angle)) return;
             if (!DA.GetData(2, ref in_AngleStep)) return;
+ 
 
             // We should now validate the data and warn the user if invalid data is supplied.
             if (!in_Mesh.IsValid)
@@ -76,27 +80,70 @@ namespace ViewAnalysis
 
             // 2. Unpack Data and create cones
             List<Point3d> point3Ds = tuple.Item1;
-            MeshFaceNormalList vector3Ds = tuple.Item2;
 
-            // 3. Init ViewCone
-            ViewCone firstViewCone = new ViewCone(point3Ds[0], vector3Ds[0], in_Angle, in_AngleStep);
+            // 3. Declare the two types of list that you might use depending on whether the vector input has override
+            MeshFaceNormalList meshFaceNormals;
+            List<Vector3d> overRideVectors = new List<Vector3d>();
 
-            // 4. Calculate only first cone to get Ray count
-            firstViewCone.ComputeViewCone();
-            int out_RayCount = firstViewCone.RayCount;
+            // 4. Create check in put bool
 
-            // 5. For each point, compute view cone
-            List<List<Ray3d>> out_ViewRays = new List<List<Ray3d>>();
-            for (int i = 0; i < point3Ds.Count; i++)
+            if (!DA.GetData(3, ref in_Vector))
             {
-                ViewCone viewCone = new ViewCone(point3Ds[i], vector3Ds[i], in_Angle, in_AngleStep);
-                List<Ray3d> rays = viewCone.ComputeViewCone();
-                out_ViewRays.Add(rays);
-            }
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "No override vector provided, will use normals of analysis mesh");
+                meshFaceNormals = tuple.Item2;
 
-            // 6. Finally assign the output parameters
-            DA.SetDataList(0, out_ViewRays);
-            DA.SetData(1, out_RayCount);
+                // 5. Init ViewCone
+                ViewCone firstViewCone = new ViewCone(point3Ds[0], meshFaceNormals[0], in_Angle, in_AngleStep);
+
+                // 6. Calculate only first cone to get Ray count
+                firstViewCone.ComputeViewCone();
+                int out_RayCount = firstViewCone.RayCount;
+
+                // 7. For each point, compute view cone
+                List<List<Ray3d>> out_ViewRays = new List<List<Ray3d>>();
+                for (int i = 0; i < point3Ds.Count; i++)
+                {
+                    ViewCone viewCone = new ViewCone(point3Ds[i], meshFaceNormals[i], in_Angle, in_AngleStep);
+                    List<Ray3d> rays = viewCone.ComputeViewCone();
+                    out_ViewRays.Add(rays);
+                }
+
+                // 8. Finally assign the output parameters
+                DA.SetDataList(0, out_ViewRays);
+                DA.SetData(1, out_RayCount);
+            }
+            else
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Override vector was provided, will use this vector");
+                List<Vector3d> vector3Ds = new List<Vector3d>();
+                for (int i = 0; i < point3Ds.Count; i++)
+                {
+                    overRideVectors.Add(in_Vector);
+                }
+
+                // 5. Init ViewCone
+                ViewCone firstViewCone = new ViewCone(point3Ds[0], vector3Ds[0], in_Angle, in_AngleStep);
+
+                // 6. Calculate only first cone to get Ray count
+                firstViewCone.ComputeViewCone();
+                int out_RayCount = firstViewCone.RayCount;
+
+                // 7. For each point, compute view cone
+                List<List<Ray3d>> out_ViewRays = new List<List<Ray3d>>();
+                for (int i = 0; i < point3Ds.Count; i++)
+                {
+                    ViewCone viewCone = new ViewCone(point3Ds[i], vector3Ds[i], in_Angle, in_AngleStep);
+                    List<Ray3d> rays = viewCone.ComputeViewCone();
+                    out_ViewRays.Add(rays);
+                }
+
+                // 8. Finally assign the output parameters
+                DA.SetDataList(0, out_ViewRays);
+                DA.SetData(1, out_RayCount);
+            }
+           
+
+
             
             
         }
