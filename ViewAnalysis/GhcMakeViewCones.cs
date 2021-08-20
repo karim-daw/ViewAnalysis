@@ -22,6 +22,7 @@ namespace ViewAnalysis
             pManager.AddNumberParameter("ViewAngle", "Angle", "Angle range. If None, 120 degrees is used {item:float}", GH_ParamAccess.item, 120.0);
             pManager.AddIntegerParameter("AngleIntervalResolution", "Interval", "Angle interval that will determine the resolution of the generated view cone {item:int}", GH_ParamAccess.item, 20);
             pManager.AddVectorParameter("VectorOverride", "Vector", "Optional vector input if you want to override the view direction {item:Vector3d}", GH_ParamAccess.item);
+            pManager[3].Optional = true;
         }
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
@@ -51,7 +52,7 @@ namespace ViewAnalysis
             }
             if (!DA.GetData(1, ref in_Angle)) return;
             if (!DA.GetData(2, ref in_AngleStep)) return;
-            if (!DA.GetData(3, ref in_Vector)) return;
+ 
 
             // We should now validate the data and warn the user if invalid data is supplied.
             if (!in_Mesh.IsValid)
